@@ -4,18 +4,16 @@
 
 ## 在 Windows 11 安装
 
-在此仓库根目录打开 PowerShell。以下命令将当前提交安装到本机 Codex 的用户级 skills 目录，并在同名安装存在时停止。
+从本地 Git 仓库根目录运行以下 PowerShell 命令。Windows 目录联接让所有项目共用这份工作树，更新仓库即可更新 Skill。用户级路径见 [Codex Skills 安装说明](https://developers.openai.com/api/reference/cli)。
 
 ```powershell
-$base = if ($env:CODEX_HOME) { $env:CODEX_HOME } else { Join-Path $HOME '.codex' }
-$dest = Join-Path $base 'skills/frontend-design-director'
+$src = (Resolve-Path .).Path
+if (!(Test-Path -LiteralPath (Join-Path $src 'SKILL.md'))) { throw '请在 Skill 根目录运行' }
+$root = Join-Path $HOME '.agents/skills'
+New-Item -ItemType Directory -Path $root -Force | Out-Null
+$dest = Join-Path $root 'frontend-design-director'
 if (Test-Path -LiteralPath $dest) { throw "同名 Skill 已存在：$dest" }
-New-Item -ItemType Directory -Path $dest -ErrorAction Stop | Out-Null
-$archive = Join-Path ([IO.Path]::GetTempPath()) ("frontend-design-" + [guid]::NewGuid() + ".zip")
-git archive --format=zip "--output=$archive" HEAD
-if ($LASTEXITCODE) { throw "git archive failed" }
-Expand-Archive -LiteralPath $archive -DestinationPath $dest
-Remove-Item -LiteralPath $archive
+New-Item -ItemType Junction -Path $dest -Target $src
 ```
 
 重启 Codex，在目标项目的新对话中使用下面任一提示词。也可用自然语言提出界面设计或改版需求，由 Codex 选择 Skill。
