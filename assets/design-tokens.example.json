@@ -1,0 +1,32 @@
+{
+  "color": {
+    "surface": "#FAF9F6",
+    "text": "#242321",
+    "accent": "#095E51",
+    "focus": "#1059A1",
+    "error": "#9A291A"
+  },
+  "type": {
+    "body": "system-ui, sans-serif",
+    "display": "Georgia, serif",
+    "bodySize": "1rem",
+    "headline": "clamp(2rem, 5vw, 4rem)"
+  },
+  "space": [
+    4,
+    8,
+    12,
+    16,
+    24,
+    32,
+    48
+  ],
+  "grid": {
+    "maxWidth": "76rem",
+    "gutter": "clamp(1rem, 4vw, 3rem)"
+  },
+  "motion": {
+    "feedback": "140ms",
+    "reduced": "0ms"
+  }
+}
