@@ -4,8 +4,8 @@
 
 |来源与访问状态|研究重点与适用场景|候选布局|字色方向|交互试验|可能实现|
 |---|---|---|---|---|---|
-|[www.awwwards.com](https://www.awwwards.com/) · 未取得可分析正文|从获奖项目找一个主场景|一个主场景加常驻出口|大标题配克制的中性色|入口提示随焦点与指针响应|CSS transform；复杂编排才考虑 GSAP|
-|[thefwa.com](https://thefwa.com/) · 可读|研究数字体验如何引导首次探索|一个主场景加常驻出口|大标题配克制的中性色|入口提示随焦点与指针响应|CSS transform；复杂编排才考虑 GSAP|
-|[www.cssdesignawards.com](https://www.cssdesignawards.com/) · 可读|比较视觉、可用性与创意的取舍|一个主场景加常驻出口|大标题配克制的中性色|入口提示随焦点与指针响应|CSS transform；复杂编排才考虑 GSAP|
-|[recent.design](https://recent.design/) · 可读|寻找近期作品的编排节奏|一个主场景加常驻出口|大标题配克制的中性色|入口提示随焦点与指针响应|CSS transform；复杂编排才考虑 GSAP|
-|[www.hoverstat.es](https://www.hoverstat.es/) · 可读|研究细小反馈如何揭示可点击区域|一个主场景加常驻出口|大标题配克制的中性色|入口提示随焦点与指针响应|CSS transform；复杂编排才考虑 GSAP|
+|[www.awwwards.com](https://www.awwwards.com/) · 未取得可分析正文|从获奖项目找一个主场景|全屏开场后直达案例|展示字与正文分级，品牌色点题|跳过开场|CSS 动态与原生链接|
+|[thefwa.com](https://thefwa.com/) · 可读|研究数字体验如何引导首次探索|单一实验场景与说明栏|短标签保持场景可读|切换场景时保留出口|Canvas 配 DOM 导航|
+|[www.cssdesignawards.com](https://www.cssdesignawards.com/) · 可读|比较视觉、可用性与创意的取舍|同一作品的视觉与操作分区|强调色只标当下行动|焦点态与悬停等价|CSS 状态选择器|
+|[recent.design](https://recent.design/) · 可读|寻找近期作品的编排节奏|按日期编排作品索引|日期用等宽数字|筛选后保留阅读位置|语义列表|
+|[www.hoverstat.es](https://www.hoverstat.es/) · 可读|研究细小反馈如何揭示可点击区域|在标题旁显示小型预览|保留清晰正文对比|聚焦时也展示预览|CSS focus-within|
