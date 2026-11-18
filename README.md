@@ -1,43 +1,41 @@
-# Frontend Design Director
+# Frontend Design Director v2
 
-一个可安装的 Codex Skill，用于从零设计 Web 界面，或在保留现有业务流程的前提下改版。给它一个前端项目和一项用户任务，它会检查代码、选择视觉方向，把设计落实到可操作的页面，再验证这条任务路径。
+一个用于 Web 前端设计与实现的 Codex Skill。面对创意项目，它先比较三种视觉概念，再用真实输入验证其中一种；面对已有产品，它沿着现有路由和业务状态完成增量改版。
 
-[安装](#安装) · [调用示例](#调用示例) · [设计方向](#六种设计方向) · [工作流源文件](SKILL.md)
+[![Form Studies 运行首屏：现场投影的可旋转线束](docs/evidence/opening.png)](https://gaoyuan513.github.io/frontend-design-director/)
 
-## Showcase
+**[进入 Live Demo ↗](https://gaoyuan513.github.io/frontend-design-director/)** · [安装](#安装) · [调用示例](#调用示例) · [实测记录](docs/acceptance.md)
 
-以下是六张原创设计方向示意图（illustrative mockups）。它们用虚构项目说明布局选择，均为静态配图；仓库内交付的是 Skill 指令与参考资料。点开图片可查看细节。
+## Form Studies / 现场实验
 
-| Creative / Experimental · Phase Shift | Dashboard / Workspace · Trace Desk |
+拖动线体改变观察角度；向下滚动，线束沿深度方向展开。到达实验索引后，横拖选择一个方向，进入详情并亲手改变其状态。
+
+[播放桌面与手机录屏](https://gaoyuan513.github.io/frontend-design-director/reel/) · [桌面 MP4](docs/demo/reel/form-studies-desktop.mp4) · [手机 MP4](docs/demo/reel/form-studies-mobile.mp4) · [动图预览](docs/evidence/field-session.gif) · [静态源码](docs/demo/)
+
+以下图片全部来自运行中的浏览器。每个 Demo 只实现表中描述的一段交互；排班和运行日志使用本地示例数据。
+
+| Creative / Experimental · 曲面调制 | Premium / Editorial · 光影手记 |
 | --- | --- |
-| ![Phase Shift 材料研究工作室首页，珊瑚红底上的折叠金属与窄体大标题](assets/showcase-creative.webp) | ![Trace Desk 的运行列表与选中任务的错误日志、重试入口并排显示](assets/showcase-dashboard.webp) |
-| 金属折带贯穿首屏，作品入口留在视觉动线的终点。 | 失败任务、错误行和重试按钮同屏，操作者可以边看日志边定位问题。 |
+| [![实时线束参数控制](docs/evidence/creative.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-creative) | [![建筑照片的章节阅读器](docs/evidence/editorial.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-editorial) |
+| 调整幅度，改变曲面的折叠程度。 | 选择章节，改变取景位置与阅读内容。 |
 
-| Spatial Gallery · Specimen Atlas | Minimal / Swiss · Index Office |
+| SaaS / Product · 排班试印 | Dashboard / Workspace · 事件回放 |
 | --- | --- |
-| ![Specimen Atlas 矿物画布，包含选中标本、缩略地图和列表切换入口](assets/showcase-gallery.webp) | ![Index Office 工作坊日程，以细线和对齐的日期、时间列组织场次](assets/showcase-minimal.webp) |
-| 矿物分布在可探索的地图上，列表入口照顾已知名称、只想查找标本的人。 | 日期和时间各自对齐，读者扫过一列就能比较场次。 |
+| [![排班草稿发布状态](docs/evidence/product.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-product) | [![查看运行并重试](docs/evidence/workspace.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-workspace) |
+| 修改周五班次，再发布草稿。 | 查看失败事件，重试并观察完成状态。 |
 
-| Premium / Editorial · Margin Review | SaaS / Product · Shiftbook |
+| Spatial Gallery · 空间标本 | Minimal / Swiss · 场次索引 |
 | --- | --- |
-| ![Margin Review 建筑专题，用庭院照片、图注和窄栏正文组织阅读](assets/showcase-editorial.webp) | ![Shiftbook 产品官网展示花店的一周排班表与试用入口](assets/showcase-product.webp) |
-| 庭院照片和图注建立空间感，章节索引让读者可以直接进入关心的部分。 | 访客先看懂一周班表，再决定是否试用排班工具。 |
+| [![空间标本平移及列表定位](docs/evidence/gallery.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-gallery) | [![工作坊排序](docs/evidence/swiss.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-swiss) |
+| 拖动画布寻找标本，也可通过名称定位。 | 改变排序依据，比较课程名和时间。 |
 
-[查看配图提示词与 Markdown](docs/showcase.md)
+## 创意项目怎样进入实现
 
-## 为什么做这个 Skill
+1. 在写界面之前，比较三种概念的隐喻、主视觉对象、构图、输入、状态变化和实现成本。选定一种，说明它为什么适合这项任务。
+2. 从实际参考作品提炼一条原则，标明亲手操作、奖项资料与实现推测之间的区别。[案例笔记](references/award-winning-case-studies.md)
+3. 先做最难的输入原型；为滚动、文字进入和场景退出写明触发、变化、持续与中断。依内容需要选择 CSS、Canvas 或 GPU。[艺术与动效指导](references/creative-direction.md)
+4. 在真实浏览器中完成一次进入、操作、返回的路径。验证触控、键盘、减弱动态与活动帧耗时。[Creative Quality Gate](references/quality-checklist.md)
 
-同一个 AI 产品，官网访客要判断是否值得试用，工作台用户要找出刚刚失败的任务。两者如果都套用“大标题加一排卡片”，首页可能好看，操作者却仍得在几个页面之间来回找日志。
-
-Frontend Design Director 要求 Codex 先说明谁在使用页面、要完成什么，再选择一种主导风格。改版时沿着真实路由走一遍关键流程；设计稿里的“重试”，最终要接回项目已有的状态和错误处理。
-
-## 它如何工作
-
-1. **读项目。** 检查技术栈、组件、路由和状态。新项目先梳理入口、任务、详情与恢复页面；已有项目先记录可运行的基线。
-2. **选方向。** 根据用户任务、设备和内容密度选择主导风格，也可按你指定的方向实现。把选择落实到字阶、网格、间距和语义色。
-3. **查参考。** 五类目录收录 38 个来源，涵盖设计奖项、网页案例、产品 UI、实际网站和实现技术。每次只加载相关分类，挑一两个案例，说明哪条原则能用在当前项目。访问状态和设计建议分别记录。[参考库入口](references/design-sources.md)
-4. **完成一条业务流程。** 复用现有技术栈和组件，接入真实路由与数据，按需补齐加载、空、错误和完成状态。[交互模式](references/interaction-patterns.md)
-5. **检查并修复。** 运行项目已有检查。有浏览器时验证桌面、窄屏、键盘、返回和减弱动态；没有浏览器时列出待人工验证的步骤。[验收清单](references/quality-checklist.md)
 
 ## 六种设计方向
 
@@ -72,9 +70,15 @@ New-Item -ItemType Junction -Path $dest -Target $src
 Test-Path -LiteralPath (Join-Path $dest 'SKILL.md')
 ```
 
-最后一行应返回 `True`。保留本地仓库，在要开发的 **Web 项目** 中打开新的 Codex 会话并输入下面任一提示词。如果 Skill 未出现，重启 Codex 后再试。私有仓库需要具有访问权限的 GitHub 账号才能克隆。
+最后一行应返回 `True`。保留本地仓库，在要开发的 **Web 项目** 中打开新的 Codex 会话并输入下面任一提示词。如果 Skill 未出现，重启 Codex 后再试。
 
 ## 调用示例
+
+**创意作品集 · 从概念到浏览器**
+
+```text
+$frontend-design-director 为我的声音采集作品集设计一个可操纵的视觉对象。比较三种概念后实现一种，用滚动连接地点与录音详情；给出触控、键盘与减弱动态路径，用浏览器验证输入确实改变场景。音频由用户主动播放。
+```
 
 **产品官网 · 从零开发**
 
@@ -106,8 +110,12 @@ $frontend-design-director 用 Premium / Editorial 方向实现一期双语建筑
 | --- | --- |
 | [SKILL.md](SKILL.md) | 触发条件、项目分析与实施步骤，供 Codex 在调用时读取。 |
 | [references/](references/) | 模式选择、来源索引、交互建议和浏览器验收清单，按任务加载。 |
-| [assets/](assets/) | 可适配到项目主题的 [Token 示例](assets/design-tokens.example.json) 及 README 配图。 |
+| [assets/](assets/) | 可适配到项目主题的 [Token 示例](assets/design-tokens.example.json) 与早期静态概念图。 |
 | [agents/openai.yaml](agents/openai.yaml) | Codex 界面使用的名称和简短描述。 |
+| [docs/demo/](docs/demo/) | 可直接部署的静态实验站与独立录屏播放页。 |
+| [docs/evidence/](docs/evidence/) | 浏览器截图与动图。 |
+
+从仓库根目录运行 `python -m http.server 8000 --directory docs/demo`，在浏览器打开 [本地预览](http://127.0.0.1:8000/)。
 
 ## Roadmap
 
