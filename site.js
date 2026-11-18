@@ -38,7 +38,7 @@ function openRoute(){
   const [slug,mode,title,,paper,ink]=m;
   opener=document.querySelector('a[href="#demo-'+slug+'"]');
   $('#mode').textContent='DEMO / '+mode;
-  $('#content').innerHTML='<section class="demo"><h2>'+title+'</h2><div id="sample"></div></section>';
+  $('#content').innerHTML='<section class="demo"><h2 id="experiment-title">'+title+'</h2><div id="sample"></div></section>';
   $('.demo').style.setProperty('--paper',paper);$('.demo').style.setProperty('--ink',ink);
   if(!dialog.open)dialog.showModal();
   document.body.style.overflow='hidden';

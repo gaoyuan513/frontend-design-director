@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#101411">
+  <link rel="icon" href="data:,">
+  <title>Form Studies · 交互录屏</title>
+  <style>
+    * { box-sizing: border-box }
+    body { margin: 0; background: #101411; color: #f0ede1; font: 1rem/1.65 system-ui, sans-serif }
+    main { width: min(1180px, 92%); margin: 0 auto; padding: 42px 0 68px }
+    a { color: #f6c88e; text-underline-offset: .25em }
+    a:focus-visible, video:focus-visible { outline: 3px solid #ffae56; outline-offset: 3px }
+    h1 { font: 400 clamp(3rem, 8vw, 7rem)/.98 Georgia, serif; letter-spacing: -.055em; margin: 30px 0 14px }
+    p { max-width: 37em; margin-top: .5em; color: #cfd1c6 }
+    .reels { display: grid; grid-template-columns: minmax(0, 1fr) minmax(210px, .3fr); gap: clamp(18px, 4vw, 48px) }
+    h2 { font-size: 1rem; font-weight: 650; margin-bottom: .7em }
+    video { width: 100%; display: block; height: auto; background: #161c17; border: 1px solid #657064 }
+    .desktop { aspect-ratio: 16 / 9 }
+    .mobile { aspect-ratio: 1 / 2; max-width: 320px }
+    @media (max-width: 680px) { .reels { grid-template-columns: 1fr } }
+  </style>
+</head>
+<body>
+  <main>
+    <a href="../">← 返回交互现场</a>
+    <h1>Form Studies</h1>
+    <p>两段真实浏览器录屏，分别演示指针与触控操作。</p>
+    <div class="reels">
+      <section>
+        <h2>桌面 · 旋转、展开、浏览六个实验</h2>
+        <video class="desktop" controls muted playsinline preload="metadata" poster="opening.png" aria-label="桌面交互录屏">
+          <source src="form-studies-desktop.mp4" type="video/mp4">
+          <a href="form-studies-desktop.mp4">打开桌面录屏</a>
+        </video>
+      </section>
+      <section>
+        <h2>手机 · 旋转、横滑、调节形态</h2>
+        <video class="mobile" controls muted playsinline preload="metadata" poster="mobile.png" aria-label="手机视口交互录屏">
+          <source src="form-studies-mobile.mp4" type="video/mp4">
+          <a href="form-studies-mobile.mp4">打开手机录屏</a>
+        </video>
+      </section>
+    </div>
+  </main>
+</body>
+</html>
