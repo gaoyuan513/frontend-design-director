@@ -1,10 +1,42 @@
-# Frontend Design Director
+[![Frontend Design Director。面向 Codex 的前端设计、实现与浏览器验收。右侧展示沿岸声志、印刷所开放日及发布诊断台的界面实拍。](docs/demo/cases/previews/cover.webp)](https://gaoyuan513.github.io/frontend-design-director/cases/)
 
-让 Codex 在真实项目里完成前端设计、实现和浏览器验收。可以从一张设计稿、一段出错的交互，或一个还没有视觉方向的想法开始。
+<p align="center">
+  <strong><a href="https://gaoyuan513.github.io/frontend-design-director/cases/">浏览在线案例</a></strong>
+  · <a href="#quick-start">安装与调用</a>
+  · <a href="#skill-怎样工作">工作流程</a>
+  · <a href="https://github.com/gaoyuan513/frontend-design-director/blob/main/docs/acceptance.md">浏览器实测</a>
+  · <a href="#english">English</a>
+</p>
 
-**[打开交互演示](https://gaoyuan513.github.io/frontend-design-director/)** · [安装](#quick-start) · [调用示例](#调用示例) · [浏览器实测](docs/acceptance.md) · [English](#english)
+**Frontend Design Director** 是一个把前端设计、代码实现和浏览器验收连起来的 Codex Skill。有设计稿时按已有视觉和组件落地。从零开始时先明确访客要做什么，再决定版式、素材和交互。修现有页面时从出问题的路径开始。
 
-[![Form Studies 首页：可旋转的线束装置和实验索引入口](docs/evidence/opening.png)](https://gaoyuan513.github.io/frontend-design-director/)
+## 按任务看案例
+
+这四个页面可以直接操作。点图打开对应案例，按下面的步骤观察界面变化。
+
+| 创意导航 | 产品工作台 |
+| --- | --- |
+| [![沿岸声志的航图、场景详情和播放器](docs/demo/cases/previews/coast-atlas.webp)](https://gaoyuan513.github.io/frontend-design-director/cases/coast-atlas/) | [![发布诊断台的运行列表、选中任务和日志](docs/demo/cases/previews/release-desk.webp)](https://gaoyuan513.github.io/frontend-design-director/cases/release-desk/) |
+| **沿岸声志 · Coastal Sound Atlas**<br>图上的位置决定当前场景和音频。点夜港，试听声景、跳转波形或收藏。<br>[在线操作](https://gaoyuan513.github.io/frontend-design-director/cases/coast-atlas/) · [源码](docs/demo/cases/coast-atlas/index.html) | **发布诊断台 · Release Desk**<br>失败原因、日志和恢复入口在同一工作区。筛选失败任务，重试并观察状态变化。<br>[在线操作](https://gaoyuan513.github.io/frontend-design-director/cases/release-desk/) · [源码](docs/demo/cases/release-desk/index.html) |
+
+| 编辑专题 | 活动索引 |
+| --- | --- |
+| [![光井建筑专题的建筑摄影和章节导航](docs/demo/cases/previews/lightwell.webp)](https://gaoyuan513.github.io/frontend-design-director/cases/lightwell/) | [![印刷所开放日的红色海报与工作坊索引](docs/demo/cases/previews/print-room.webp)](https://gaoyuan513.github.io/frontend-design-director/cases/print-room/) |
+| **光井 · Lightwell**<br>同一张摄影用不同取景展示院落的空间线索。切换章节，再用章节链接打开同一视角。<br>[在线操作](https://gaoyuan513.github.io/frontend-design-director/cases/lightwell/) · [源码](docs/demo/cases/lightwell/index.html) | **印刷所开放日 · Print Room**<br>日期和印刷工艺能组合筛选。打开一场活动，查看详情和可下载的准备清单。<br>[在线操作](https://gaoyuan513.github.io/frontend-design-director/cases/print-room/) · [源码](docs/demo/cases/print-room/index.html) |
+
+案例中的运行记录、活动和声景均为示例内容。图片来自运行中的浏览器。各案例的复现步骤与验证范围见[实测记录](docs/acceptance.md)。
+
+### 从一句需求到可验收的页面
+
+以「发布诊断台」为例，给 Codex 一条可以一起完成和验证的任务。
+
+```text
+$frontend-design-director 为发布运行页做一个诊断工作台。用户需要筛出失败发布，
+读到失败原因，再重试并看到结果。在桌面同时保留列表和详情，核对手机布局。
+请用浏览器走完失败、重试中、完成的状态变化。
+```
+
+设计先确定列表、选中项、恢复操作之间的联系。实现时要保留可操作的失败态和等待反馈。交付时运行同一条流程，检查变化出现在正确的任务上。[试运行发布诊断台](https://gaoyuan513.github.io/frontend-design-director/cases/release-desk/) · [产品流程指南](references/product-interfaces.md)
 
 ## Quick start
 
@@ -26,93 +58,61 @@ New-Item -ItemType Junction -Path $skillTarget -Target $skillSource | Out-Null
 Test-Path -LiteralPath (Join-Path $skillTarget 'SKILL.md')
 ```
 
-看到 `True` 后，在要开发的 Web 项目里打开新的 Codex 会话，试一条下面的提示词。目录联接指向本地仓库，之后在仓库内运行 `git pull --ff-only` 即可获取更新。
-
-## 一条可以亲手验证的路径
-
-### 事件回放 · 从失败运行到重试完成
-
-> 改版 Agent 运行页。让用户看清失败原因、保留所选任务，并能从日志发起重试。在窄屏上检查操作反馈和返回后的焦点。
-
-这个场景用列表保留运行上下文，在详情里显示失败原因和下一步。打开演示，选择「导入索引」，点「重试导入」，观察日志和任务状态如何更新。退出详情时检查焦点是否回到可以继续操作的位置。
-
-[![事件回放：运行状态、日志和恢复操作](docs/evidence/workspace.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-workspace)
-
-[试运行事件回放](https://gaoyuan513.github.io/frontend-design-director/#demo-workspace) · [产品流程指南](references/product-interfaces.md) · [实测记录](docs/acceptance.md)
-
-## Form Studies · 六个可操作实验
-
-首屏可以拖动线体、按按钮旋转或随滚动展开。实验索引里的每项都有可分享的详情链接。排班和运行日志使用本地示例数据。
-
-| 实验 | 可以验证的交互 |
-| --- | --- |
-| [曲面调制](https://gaoyuan513.github.io/frontend-design-director/#demo-creative) | 调整幅度，观察曲面折叠程度随输入变化 |
-| [光影手记](https://gaoyuan513.github.io/frontend-design-director/#demo-editorial) | 切换章节，观察取景位置和正文同步改变 |
-| [排班试印](https://gaoyuan513.github.io/frontend-design-director/#demo-product) | 修改周五班次并发布草稿 |
-| [事件回放](https://gaoyuan513.github.io/frontend-design-director/#demo-workspace) | 查看失败事件，重试并观察完成状态 |
-| [空间标本](https://gaoyuan513.github.io/frontend-design-director/#demo-gallery) | 拖画布探索，或按标本名称定位 |
-| [场次索引](https://gaoyuan513.github.io/frontend-design-director/#demo-swiss) | 切换排序依据，比较课程名和时间 |
-
-[桌面与手机录屏](https://gaoyuan513.github.io/frontend-design-director/reel/) · [六种界面截图](#实验截图) · [静态源码](docs/demo/)
-
-### 实验截图
-
-<details>
-<summary>展开六种设计方向的浏览器实拍</summary>
-
-| Creative / Experimental | Premium / Editorial |
-| --- | --- |
-| [![曲面调制](docs/evidence/creative.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-creative) | [![光影手记](docs/evidence/editorial.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-editorial) |
-
-| SaaS / Product | Dashboard / Workspace |
-| --- | --- |
-| [![排班试印](docs/evidence/product.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-product) | [![事件回放](docs/evidence/workspace.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-workspace) |
-
-| Spatial Gallery | Minimal / Swiss |
-| --- | --- |
-| [![空间标本](docs/evidence/gallery.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-gallery) | [![场次索引](docs/evidence/swiss.png)](https://gaoyuan513.github.io/frontend-design-director/#demo-swiss) |
-
-</details>
+看到 `True` 后，在你要开发的 Web 项目里打开新的 Codex 会话，输入 `$frontend-design-director` 加上你的任务。以后在这份仓库里运行 `git pull --ff-only` 即可更新目录联接指向的 Skill。
 
 ## Skill 怎样工作
 
-1. **定位任务。** 找到真实入口、数据和已有组件。局部修复先复现，按设计稿实现先确认参考的视口和状态。[实施入口](SKILL.md) · [前端实现指南](references/implementation.md)
-2. **确定设计决策。** 有视觉空间时，把主操作、内容、版式、字体和色彩落到一个具体方案。产品改版先梳理失败恢复。创意页面先让关键输入产生可见反馈。[设计方向](references/design-styles.md) · [创意指导](references/creative-direction.md)
-3. **完成并验收。** 用真实内容走主路径，按任务检查相邻断点、键盘、触控或失败状态。记录观察结果和验证范围。[浏览器验收指南](references/quality-checklist.md)
+1. **理解任务。** 找到用户的入口、主要操作和已有项目的布局、组件、数据约定。有错误时先复现。有设计稿时确认其对应的视口、字体、素材和状态。[实现指南](references/implementation.md)
+2. **做有依据的视觉选择。** 从真实内容决定首屏焦点、字号、视觉层级和窄屏顺序。新页面可先写一份短计划，说明方案服务哪个用户动作，最可能在哪个状态失效。[设计方向及示例](references/design-styles.md)
+3. **先完成一条可用路径。** 产品界面用真实数据契约驱动加载、失败与恢复。创意页面先验证定义体验的输入，再加转场和细节。[产品流程](references/product-interfaces.md) · [创意指导](references/creative-direction.md)
+4. **用浏览器复测。** 按需求检查断点、键盘、触控、减弱动态、异步状态和性能。记录实测路径与未覆盖范围。[验收指南](references/quality-checklist.md)
 
-设计决策的组织方式参考了 UI UX Pro Max 从场景推导设计系统的做法。展示借鉴了它用单一 brief 串起设计与运行结果的方式，以及 Taste Skill 和 Impeccable 用具体界面变化呈现结果的做法。[UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) · [Taste Skill](https://www.tasteskill.dev/) · [Impeccable Gallery](https://impeccable.style/gallery/)
+### 适合哪些前端任务
 
-## 调用示例
+| 你的任务 | 可以要求的结果 |
+| --- | --- |
+| 有桌面稿或截图 | 复用组件和设计令牌，落地相同的层级与素材，说明未提供的窄屏和错误状态怎样处理。 |
+| 现有页面出问题 | 复现指定宽度、状态和操作，用最小改动修复，再检查焦点或相邻断点。 |
+| 从零搭页面或改版 | 从访客任务确定信息顺序和风格，实现第一条完整操作路径。 |
+| 改产品流程或工作台 | 验证筛选、选择、加载、失败、重试、刷新或返回后的状态。 |
+| 做作品集或互动体验 | 用一个可感知的输入连接内容，提供键盘、触控与减弱动态路径。 |
 
-**局部修复**
+这个 Skill 会读当前项目的代码和文档，沿用可复用的组件、样式和工具。它本身是可安装的指令与参考资料，生成的页面在各自项目的技术栈里运行。[Skill 入口](SKILL.md) · [按任务加载的参考资料](references/)
 
-```text
-$frontend-design-director 修复 390px 下订单筛选弹层标题被裁切的问题。复用现有 Dialog，验证键盘关闭与焦点恢复。
-```
-
-**按设计稿实现**
-
-```text
-$frontend-design-director 用现有组件实现这份桌面稿。保持图文层级与主操作，按阅读顺序重排窄屏布局，并注明从设计稿推导的状态。
-```
-
-**沉浸式作品集**
+### 可复制的调用提示词
 
 ```text
-$frontend-design-director 为声音采集作品集设计一个可以操纵的视觉对象，用滚动连接地点与录音详情。验证触控、键盘和减弱动态路径。音频由访客主动播放。
+$frontend-design-director 修复订单页筛选弹层在 390px 下裁切的问题。
+复用现有 Dialog，确认 Escape 关闭、焦点返回和断点附近的布局。
 ```
 
-## 开发和资料
+```text
+$frontend-design-director 用现有组件实现这份桌面稿。保持图文层级和主操作，
+按阅读顺序重排手机布局，说明从设计稿推导了哪些交互状态。
+```
 
-从仓库根目录运行 `python -m http.server 8000 --directory docs/demo`，然后打开 [本地预览](http://127.0.0.1:8000/)。
+```text
+$frontend-design-director 给这组建筑照片做一个编辑专题。
+用同一张图的取景变化连接章节；验证键盘切换、章节深链接和窄屏图注。
+```
 
-- [参考资料](references/) 按任务加载设计、实现和验收方法。
-- [主题示例](assets/design-tokens.example.json) 提供可适配的设计令牌。
-- [展示素材说明](docs/showcase.md) 记录六个静态设计方向的图像生成提示词。
-- [Issues](https://github.com/gaoyuan513/frontend-design-director/issues) 接收使用反馈。附项目类型、提示词、预期行为与实际结果，便于复现。
+## Form Studies · 六个交互实验
+
+适合单独探索曲面调制、编辑章节、发布班表、重试运行、空间定位和列表排序。首屏可拖动、旋转线束，也可随滚动展开。[打开实验站](https://gaoyuan513.github.io/frontend-design-director/) · [桌面与手机录屏](https://gaoyuan513.github.io/frontend-design-director/reel/) · [历史实测](docs/acceptance.md#form-studies-验收记录)
+
+## 本地预览与资料
+
+在仓库根目录运行 `python -m http.server 8000 --directory docs/demo`，然后打开[本地案例集](http://127.0.0.1:8000/cases/)。
+
+- [案例与静态源码](docs/demo/cases/)
+- [设计令牌示例](assets/design-tokens.example.json)
+- [浏览器实测记录](docs/acceptance.md)
+- [报告使用问题](https://github.com/gaoyuan513/frontend-design-director/issues)，附项目类型、提示词、预期行为和复现路径
+
+展示结构参考了 UI UX Pro Max 的「需求到结果」、Taste Skill 的可观察界面证据，以及 Impeccable 按 brief 展开案例的做法。[UI UX Pro Max](https://github.com/nextlevelbuilder/ui-ux-pro-max-skill) · [Taste Skill](https://www.tasteskill.dev/) · [Impeccable Gallery](https://impeccable.style/gallery/)
 
 仓库目前尚未指定开源许可证。
 
 ## English
 
-Frontend Design Director is a Codex skill for targeted UI fixes, reference-led builds, responsive product flows, and interactive websites. Try the [live experiments](https://gaoyuan513.github.io/frontend-design-director/), follow the [Windows quick start](#quick-start), then invoke the skill in a web project with `$frontend-design-director`.
+Frontend Design Director is a Codex skill for UI fixes, design-to-code work, product workflows, and interactive sites. Browse the [live case collection](https://gaoyuan513.github.io/frontend-design-director/cases/), follow the [Windows quick start](#quick-start), and invoke `$frontend-design-director` in a web project.

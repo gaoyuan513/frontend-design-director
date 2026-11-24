@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#151615">
+  <meta name="description" content="一个可筛选、诊断与重试的发布流水线演示。">
+  <link rel="icon" href="data:,">
+  <title>发布诊断台 · Release Desk</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --paper: #151615;
+      --panel: #1b1c1a;
+      --raised: #22231f;
+      --line: #363831;
+      --ink: #f5f2e9;
+      --muted: #b5b6ab;
+      --quiet: #909387;
+      --accent: #ffc195;
+      --success: #a6c997;
+      --running: #c4b2f1;
+      --failed: #ffb998;
+      --mono: 'Cascadia Mono', 'SFMono-Regular', Consolas, monospace;
+      --sans: 'Microsoft YaHei UI', 'PingFang SC', system-ui, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    body { margin: 0; background: var(--paper); color: var(--ink); font: 14px/1.6 var(--sans); }
+    h1, h2, h3, p, figure { margin: 0; }
+    a { color: inherit; text-underline-offset: 4px; }
+    button { font: inherit; color: inherit; cursor: pointer; }
+    a:focus-visible, button:focus-visible, [tabindex='-1']:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+    .sr-only, .skip:not(:focus) { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .skip { position: fixed; inset: 8px auto auto 8px; z-index: 5; background: var(--ink); color: var(--paper); padding: 7px 12px; }
+    .shell { width: min(1270px, calc(100% - 112px)); margin-inline: auto; }
+    .mono { font: 12px/1.45 var(--mono); font-variant-numeric: tabular-nums; }
+    .top { border-bottom: 1px solid var(--line); }
+    .top-inner { min-height: 63px; display: flex; justify-content: space-between; align-items: center; gap: 18px; }
+    .masthead { display: flex; align-items: center; gap: 12px; font-size: 13px; font-weight: 720; letter-spacing: .015em; }
+    .mark { display: grid; grid-template-columns: repeat(3, 3px); align-items: center; gap: 3px; width: 30px; height: 30px; justify-content: center; border: 1px solid #565448; }
+    .mark i { display: block; height: 12px; background: var(--accent); transform: skewY(-26deg); }
+    .mark i:nth-child(2) { height: 17px; }
+    .mark i:nth-child(3) { height: 8px; }
+    .top a { color: var(--muted); text-decoration: none; padding: 10px 0; }
+    .top a:hover { color: var(--ink); text-decoration: underline; }
+    .intro { min-height: 162px; display: flex; align-items: end; justify-content: space-between; padding-block: 27px 32px; gap: 26px; }
+    .scope { display: flex; align-items: center; gap: 9px; color: var(--accent); }
+    .scope::before { content: ''; width: 17px; height: 1px; background: currentColor; }
+    h1 { font-size: clamp(36px, 5vw, 62px); font-weight: 800; line-height: 1.14; letter-spacing: -.06em; margin: 10px 0 12px; }
+    .intro-text { color: var(--muted); }
+    .fixture { display: flex; align-items: center; gap: 8px; white-space: nowrap; color: var(--muted); font-size: 12px; }
+    .fixture::before { content: ''; width: 7px; height: 7px; background: var(--success); border-radius: 50%; }
+    .overview { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border: 1px solid var(--line); background: var(--panel); }
+    .metric { padding: 12px 20px 14px; min-width: 0; }
+    .metric + .metric { border-inline-start: 1px solid var(--line); }
+    .metric p { color: var(--muted); font-size: 12px; }
+    .metric strong { display: block; margin-top: 3px; font: 33px/1.1 var(--mono); font-variant-numeric: tabular-nums; letter-spacing: -.08em; }
+    .metric.failed strong { color: var(--failed); }
+    .metric.running strong { color: var(--running); }
+    .metric.success strong { color: var(--success); }
+    .workspace { display: grid; grid-template-columns: minmax(0, .88fr) minmax(0, 1.25fr); gap: 18px; margin-block: 22px 34px; align-items: start; }
+    .pane { border: 1px solid var(--line); background: var(--panel); min-width: 0; }
+    .list-head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; padding: 16px 18px 11px; }
+    .list-head h2 { font-size: 17px; letter-spacing: -.025em; }
+    .list-head p { color: var(--muted); font-size: 12px; }
+    .filters { display: flex; flex-wrap: wrap; gap: 5px; padding: 0 14px 13px; }
+    .filters button, .log-controls button { border: 1px solid transparent; background: transparent; color: var(--muted); min-height: 38px; padding: 6px 12px; white-space: nowrap; }
+    .filters button:hover, .log-controls button:hover { color: var(--ink); }
+    .filters button[aria-pressed='true'] { background: var(--raised); border-color: #54554a; color: var(--ink); }
+    .runs { margin: 0; padding: 0; list-style: none; }
+    .runs > li { border-top: 1px solid var(--line); }
+    .run { display: grid; grid-template-columns: 15px minmax(0, 1fr) auto; align-items: center; gap: 11px; width: 100%; min-height: 67px; border: 0; border-inline-start: 2px solid transparent; padding: 9px 17px 9px 16px; background: transparent; text-align: start; }
+    .run:hover { background: #21221e; }
+    .run[aria-pressed='true'] { border-inline-start-color: var(--accent); background: #292821; }
+    .run:focus-visible { outline-offset: -3px; }
+    .run-name { display: block; font: 600 15px/1.4 var(--mono); overflow-wrap: anywhere; }
+    .run-meta { display: block; color: var(--muted); font-size: 11px; margin-top: 3px; }
+    .run-state { display: block; text-align: end; font-size: 12px; }
+    .run-state time { display: block; color: var(--quiet); font-size: 10px; margin-top: 2px; }
+    [data-status='failed'] { --state: var(--failed); }
+    [data-status='running'] { --state: var(--running); }
+    [data-status='success'] { --state: var(--success); }
+    .tone { color: var(--state, var(--muted)); }
+    .status-symbol { display: grid; place-items: center; color: var(--state, var(--quiet)); width: 15px; height: 18px; font: 700 15px/1 var(--mono); }
+    .empty { padding: 24px 18px 26px; color: var(--muted); border-top: 1px solid var(--line); }
+    .text-button { padding: 7px 0; border: 0; background: transparent; text-decoration: underline; text-underline-offset: 4px; color: var(--accent); }
+    .detail-head { display: flex; align-items: start; justify-content: space-between; gap: 18px; padding: 17px 20px 14px; }
+    .detail-code { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--muted); }
+    .tag { display: inline-flex; align-items: center; min-height: 21px; gap: 5px; border: 1px solid color-mix(in srgb, var(--state, var(--quiet)) 34%, var(--line)); background: color-mix(in srgb, var(--state, var(--quiet)) 8%, var(--panel)); padding: 1px 7px; font-size: 11px; line-height: 1.35; font-weight: 620; }
+    .tag::before { content: ''; border-radius: 50%; width: 5px; height: 5px; background: currentColor; }
+    .detail-title { font: 650 clamp(24px, 3.1vw, 40px)/1.18 var(--mono); letter-spacing: -.075em; overflow-wrap: anywhere; margin: 7px 0 2px; }
+    .detail-title:focus-visible { outline-offset: 1px; }
+    .detail-meta { color: var(--muted); overflow-wrap: anywhere; font-size: 12px; }
+    .retry { align-self: center; min-height: 42px; border: 1px solid transparent; padding: 7px 13px; background: var(--accent); color: #21170f; font-size: 13px; font-weight: 750; white-space: nowrap; }
+    .retry:not([aria-disabled='true']):hover { background: #ffdabd; }
+    .retry[aria-disabled='true'] { background: var(--raised); color: var(--muted); border-color: var(--line); cursor: default; }
+    .retry[hidden] { display: none; }
+    .mobile-back { display: none; }
+    .detail-body { padding: 0 20px 16px; }
+    .stages { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; list-style: none; margin: 0 0 13px; padding: 0; }
+    .stage { min-height: 37px; display: grid; grid-template-columns: 15px minmax(0, 1fr); align-items: center; gap: 4px; border-bottom: 2px solid color-mix(in srgb, var(--state, var(--quiet)) 55%, var(--line)); background: var(--raised); color: var(--muted); padding: 5px 8px; font-size: 11px; }
+    .stage[data-status='failed'] { color: var(--failed); }
+    .stage[data-status='running'] { color: var(--running); }
+    .diagnosis { border: 1px solid color-mix(in srgb, var(--state, var(--quiet)) 28%, var(--line)); border-inline-start: 2px solid var(--state, var(--quiet)); background: color-mix(in srgb, var(--state, var(--quiet)) 6%, var(--panel)); padding: 10px 12px; }
+    .diagnosis h3 { color: var(--state, var(--ink)); font-size: 14px; }
+    .diagnosis p { margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.55; }
+    .log-controls { display: flex; gap: 7px; border-bottom: 1px solid var(--line); margin-top: 10px; }
+    .log-controls button { font-size: 12px; padding-inline: 8px; border-width: 0 0 2px; margin-bottom: -1px; }
+    .log-controls button[aria-pressed='true'] { color: var(--ink); border-bottom-color: var(--accent); }
+    .evidence { min-height: 110px; margin-top: 10px; background: #151613; border: 1px solid #30322a; padding: 8px 9px; }
+    .log { margin: 0; padding: 0; list-style: none; }
+    .log li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 2px 0; color: #d6d7ca; }
+    .log li.emphasis { color: var(--accent); }
+    .log time { color: var(--quiet); }
+    .log code { font: inherit; overflow-wrap: anywhere; }
+    .attempts { padding-inline: 6px; }
+    .attempts li { padding-block: 4px; }
+    .foot { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 14px; color: var(--quiet); border-top: 1px solid var(--line); padding-block: 14px 20px; font-size: 12px; }
+
+    @media (max-width: 1050px) { .shell { width: calc(100% - 54px); } }
+    @media (max-width: 760px) {
+      .shell { width: calc(100% - 34px); }
+      .top-inner { min-height: 55px; }
+      .intro { min-height: auto; display: block; padding-block: 27px 22px; }
+      .intro h1 { margin-block: 8px; }
+      .intro-text { max-width: 34ch; font-size: 13px; }
+      .fixture { margin-top: 12px; }
+      .metric { padding: 11px 6px 10px 9px; }
+      .metric p { font-size: 11px; white-space: nowrap; }
+      .metric strong { font-size: 27px; }
+      .workspace { display: block; margin-block: 18px 24px; }
+      .workspace[data-view='list'] .detail-pane, .workspace[data-view='detail'] .list-pane { display: none; }
+      .mobile-back { display: block; border: 0; background: transparent; color: var(--accent); padding: 10px 13px; min-height: 44px; }
+      .detail-head { padding: 5px 12px 13px; gap: 8px; }
+      .detail-body { padding-inline: 12px; }
+      .retry { padding-inline: 7px; }
+      .stage { padding-inline: 3px; }
+      .list-head { padding-inline: 12px; }
+      .filters { gap: 2px; padding-inline: 8px; }
+      .filters button { min-height: 43px; padding-inline: 10px; }
+      .run { padding-inline: 9px 11px; gap: 8px; }
+    }
+    @media (prefers-reduced-motion: no-preference) { button { transition: background-color 140ms ease-out, color 140ms ease-out; } }
+  </style>
+</head>
+<body>
+  <a class="skip" href="#release-main">跳到发布诊断台</a>
+  <header class="top">
+    <div class="shell top-inner">
+      <div class="masthead"><span class="mark" aria-hidden="true"><i></i><i></i><i></i></span><span lang="en">Release Desk</span></div>
+      <a href="../">← 返回案例集</a>
+    </div>
+  </header>
+  <main class="shell" id="release-main" tabindex="-1">
+    <header class="intro">
+      <div><p class="scope mono">交付流水线 <span aria-hidden="true">/</span> Storefront</p><h1>发布诊断台</h1><p class="intro-text">查看发布记录、定位失败阶段，并重试中断的流水线。</p></div>
+      <p class="fixture">本地模拟数据</p>
+    </header>
+
+    <section class="overview" aria-label="当前发布统计">
+      <div class="metric"><p>运行总数</p><strong data-total="all">06</strong></div>
+      <div class="metric failed"><p>需要处理</p><strong data-total="failed">02</strong></div>
+      <div class="metric running"><p>运行中</p><strong data-total="running">01</strong></div>
+      <div class="metric success"><p>已通过</p><strong data-total="success">03</strong></div>
+    </section>
+
+    <div class="workspace" data-view="list">
+      <section class="pane list-pane" aria-labelledby="runs-title">
+        <div class="list-head"><h2 id="runs-title" tabindex="-1">运行记录</h2><p data-match>6 条记录</p></div>
+        <div class="filters" role="group" aria-label="按状态筛选运行">
+          <button type="button" data-filter="all" aria-pressed="true">全部</button>
+          <button type="button" data-filter="failed" aria-pressed="false">失败</button>
+          <button type="button" data-filter="running" aria-pressed="false">运行中</button>
+          <button type="button" data-filter="success" aria-pressed="false">已通过</button>
+        </div>
+        <ul class="runs" data-runs></ul>
+        <div class="empty" data-empty hidden><p>这个状态下暂无记录。</p><button class="text-button" type="button" data-reset>显示全部记录</button></div>
+      </section>
+      <section class="pane detail-pane" aria-labelledby="detail-title">
+        <button class="mobile-back" type="button" data-back>← 返回运行记录</button>
+        <header class="detail-head">
+          <div><div class="detail-code"><span class="mono" data-id></span><span class="tag tone" data-badge></span></div><h2 class="detail-title" id="detail-title" tabindex="-1"></h2><p class="detail-meta mono" data-meta></p></div>
+          <button class="retry" type="button" data-retry>↻  重试发布</button>
+        </header>
+        <div class="detail-body">
+          <ol class="stages" data-stages aria-label="流水线阶段"></ol>
+          <div class="diagnosis" data-diagnosis><h3></h3><p></p></div>
+          <div class="log-controls" role="group" aria-label="运行证据">
+            <button type="button" data-tab="log" aria-pressed="true">执行日志</button>
+            <button type="button" data-tab="attempts" aria-pressed="false">执行历史</button>
+          </div>
+          <div class="evidence"><ul class="log mono" data-evidence aria-label="执行日志"></ul></div>
+        </div>
+      </section>
+    </div>
+    <footer class="foot"><span>重试在当前页面模拟执行。刷新后恢复初始发布记录。</span></footer>
+    <p class="sr-only" role="status" data-live></p>
+  </main>
+
+  <script>
+    (() => {
+      const statuses = {
+        all: '全部', failed: '失败', running: '运行中', success: '已通过', skipped: '已跳过',
+      };
+      const marks = { failed: '×', running: '◐', success: '✓', skipped: '–' };
+      const stages = ['构建', '集成测试', '部署'];
+      const runs = [
+        { id: '2481', title: 'web-checkout', branch: 'main', commit: '8fc41e2', environment: '预发布', time: '10:42', status: 'failed', stoppedAt: 1,
+          heading: '支付回调等待超时', description: '测试等待回调 15 秒后退出，部署已跳过。重试会重新构建并验证同一提交。', logs: [
+            ['10:42:01', 'build       bundle compiled in 4.2s'], ['10:42:06', 'integration started checkout callback test'],
+            ['10:42:21', 'integration callback not received in 15s', true], ['10:42:22', 'deploy      skipped after integration failure'],
+          ] },
+        { id: '2480', title: 'inventory-sync', branch: 'main', commit: 'b49e021', environment: '预发布', time: '10:34', status: 'running', stoppedAt: 2,
+          heading: '正在部署到预发布', description: '构建和集成测试已通过，等待实例完成就绪检查。', logs: [
+            ['10:34:00', 'build       bundle compiled in 3.1s'], ['10:34:04', 'integration 8 checks passed'], ['10:34:07', 'deploy      waiting for readiness check'],
+          ] },
+        { id: '2479', title: 'catalog-web', branch: 'main', commit: '5a2c763', environment: '生产', time: '10:21', status: 'success',
+          heading: '生产环境已更新', description: '页面路由与目录接口检查通过。此发布已完成。', logs: [
+            ['10:21:00', 'build       bundle compiled in 2.8s'], ['10:21:04', 'integration 11 checks passed'], ['10:21:09', 'deploy      production readiness confirmed'],
+          ] },
+        { id: '2478', title: 'price-worker', branch: 'main', commit: 'b02e8f5', environment: '预发布', time: '09:56', status: 'failed', stoppedAt: 2,
+          heading: '部署工件读取超时', description: '构建与测试正常，部署时未能读取工件。重试将重新准备该提交的工件。', logs: [
+            ['09:56:01', 'build       worker bundle ready'], ['09:56:04', 'integration 6 checks passed'], ['09:56:19', 'deploy      artifact fetch timed out', true],
+          ] },
+        { id: '2477', title: 'storefront-api', branch: 'main', commit: 'd71ac89', environment: '生产', time: '09:24', status: 'success',
+          heading: '接口发布完成', description: '库存与订单接口检查通过，已完成生产部署。', logs: [
+            ['09:24:00', 'build       service packaged'], ['09:24:05', 'integration 16 checks passed'], ['09:24:13', 'deploy      production readiness confirmed'],
+          ] },
+        { id: '2476', title: 'search-index', branch: 'main', commit: 'a0c1f54', environment: '预发布', time: '09:11', status: 'success',
+          heading: '搜索索引已就绪', description: '索引样本已通过查询检查，预发布环境已更新。', logs: [
+            ['09:11:00', 'build       index manifest prepared'], ['09:11:05', 'integration 7 queries passed'], ['09:11:09', 'deploy      preview readiness confirmed'],
+          ] },
+      ];
+      runs.forEach((run) => { run.attempts = [{ status: run.status, time: run.time, summary: run.heading }]; });
+
+      const $ = (selector) => document.querySelector(selector);
+      const $$ = (selector) => [...document.querySelectorAll(selector)];
+      const workspace = $('.workspace');
+      const list = $('[data-runs]');
+      const title = $('#detail-title');
+      const retry = $('[data-retry]');
+      const compact = matchMedia('(max-width: 760px)');
+      let filter = 'all';
+      let selected = runs[0];
+      let view = 'list';
+      let tab = 'log';
+
+      function node(tag, className, text) {
+        const element = document.createElement(tag);
+        if (className) element.className = className;
+        if (text) element.textContent = text;
+        return element;
+      }
+
+      function announce(message) { $('[data-live]').textContent = message; }
+
+      function visibleRuns() { return filter === 'all' ? runs : runs.filter((run) => run.status === filter); }
+
+      function writeRoute() {
+        const params = new URLSearchParams({ run: selected.id, status: filter, view });
+        const hash = '#' + params;
+        if (hash !== location.hash) history.replaceState(null, '', hash);
+      }
+
+      function readRoute() {
+        const params = new URLSearchParams(location.hash.slice(1));
+        if (location.hash && !['run', 'status', 'view'].some((key) => params.has(key))) return;
+        filter = ['all', 'failed', 'running', 'success'].includes(params.get('status')) ? params.get('status') : 'all';
+        selected = runs.find((run) => run.id === params.get('run')) || visibleRuns()[0] || runs[0];
+        view = params.get('view') === 'detail' ? 'detail' : 'list';
+      }
+
+      function renderMetrics() {
+        $$('[data-total]').forEach((count) => {
+          const key = count.dataset.total;
+          const total = key === 'all' ? runs.length : runs.filter((run) => run.status === key).length;
+          count.textContent = String(total).padStart(2, '0');
+        });
+      }
+
+      function runButton(run) {
+        const button = node('button', 'run');
+        button.type = 'button';
+        button.dataset.run = run.id;
+        button.dataset.status = run.status;
+        button.setAttribute('aria-pressed', String(run === selected));
+        const icon = node('span', 'status-symbol', marks[run.status]);
+        icon.setAttribute('aria-hidden', 'true');
+        const identity = node('span');
+        identity.append(node('strong', 'run-name', run.title), node('span', 'run-meta mono', '#' + run.id + ' · ' + run.environment));
+        const state = node('span', 'run-state tone', statuses[run.status]);
+        state.append(node('time', 'mono', run.time));
+        button.append(icon, identity, state);
+        const li = node('li');
+        li.append(button);
+        return li;
+      }
+
+      function renderList() {
+        const previous = document.activeElement?.dataset.run;
+        $$('[data-filter]').forEach((button) => button.setAttribute('aria-pressed', String(filter === button.dataset.filter)));
+        const rows = visibleRuns();
+        $('[data-match]').textContent = rows.length + ' 条记录';
+        $('[data-empty]').hidden = rows.length !== 0;
+        list.replaceChildren(...rows.map(runButton));
+        if (previous) ($('[data-run="' + previous + '"]') || $('[data-filter="' + filter + '"]')).focus({ preventScroll: true });
+      }
+
+      function renderStages(run) {
+        const builders = stages.map((stage, index) => {
+          let status = 'success';
+          if (index === run.stoppedAt) status = run.status;
+          if (index > run.stoppedAt) status = 'skipped';
+          const stageItem = node('li', 'stage');
+          stageItem.dataset.status = status;
+          const icon = node('span', 'status-symbol', marks[status]);
+          icon.setAttribute('aria-hidden', 'true');
+          stageItem.append(icon, node('span', '', stage), node('span', 'sr-only', statuses[status]));
+          return stageItem;
+        });
+        $('[data-stages]').replaceChildren(...builders);
+      }
+
+      function renderEvidence() {
+        const showingLog = tab === 'log';
+        const host = $('[data-evidence]');
+        host.setAttribute('aria-label', showingLog ? '执行日志' : '执行历史');
+        host.classList.toggle('attempts', !showingLog);
+        $$('[data-tab]').forEach((button) => button.setAttribute('aria-pressed', String(tab === button.dataset.tab)));
+        const evidence = showingLog ? selected.logs : selected.attempts.map((entry, index) => [
+          entry.time, '第 ' + (index + 1) + ' 次执行 · ' + statuses[entry.status] + ' · ' + entry.summary, entry.status === 'failed',
+        ]);
+        host.replaceChildren(...evidence.map(([time, text, emphasis]) => {
+          const line = node('li', emphasis ? 'emphasis' : '');
+          line.append(node('time', '', time), node(showingLog ? 'code' : 'span', '', text));
+          return line;
+        }));
+      }
+
+      function renderDetail() {
+        $('[data-id]').textContent = 'RUN / ' + selected.id;
+        const badge = $('[data-badge]');
+        badge.dataset.status = selected.status;
+        badge.textContent = statuses[selected.status];
+        title.textContent = selected.title;
+        $('[data-meta]').textContent = selected.environment + ' · ' + selected.branch + ' @ ' + selected.commit;
+        retry.hidden = selected.attempts.length === 1 && selected.status !== 'failed';
+        retry.setAttribute('aria-disabled', String(selected.status !== 'failed'));
+        retry.textContent = selected.status === 'failed' ? '↻  重试发布' : selected.status === 'running' ? '重试中…' : '重试已完成';
+        const diagnosis = $('[data-diagnosis]');
+        diagnosis.dataset.status = selected.status;
+        diagnosis.querySelector('h3').textContent = selected.heading;
+        diagnosis.querySelector('p').textContent = selected.description;
+        renderStages(selected);
+        renderEvidence();
+      }
+
+      function render() {
+        workspace.dataset.view = view;
+        renderMetrics();
+        renderList();
+        renderDetail();
+      }
+
+      function selectFilter(next) {
+        filter = next;
+        const visible = visibleRuns();
+        if (visible.length && !visible.includes(selected)) selected = visible[0];
+        view = 'list';
+        tab = 'log';
+        writeRoute();
+        render();
+        announce(statuses[filter] + '，' + visible.length + ' 条记录');
+      }
+
+      function openRun(id) {
+        selected = runs.find((run) => run.id === id);
+        view = 'detail';
+        tab = 'log';
+        writeRoute();
+        render();
+        if (compact.matches) title.focus();
+        else announce('已查看 ' + selected.title + '，' + statuses[selected.status]);
+      }
+
+      function retryRun(run) {
+        if (run.status !== 'failed') return;
+        const retryTime = '10:47';
+        const historyEntry = { status: 'running', time: retryTime, summary: '正在检查同一提交' };
+        run.attempts.push(historyEntry);
+        run.status = 'running';
+        run.stoppedAt = 1;
+        run.heading = '正在重试同一提交';
+        run.description = '本地演示正在重新执行集成检查及部署。可以切换到其他记录。';
+        run.logs = [['10:47:00', 'retry       same commit queued'], ['10:47:01', 'build       bundle compiled'], ['10:47:02', 'integration checks in progress']];
+        render();
+        announce(run.title + ' 正在重试');
+
+        setTimeout(() => {
+          historyEntry.status = 'success';
+          historyEntry.summary = '部署就绪';
+          run.status = 'success';
+          run.stoppedAt = undefined;
+          run.heading = '重试成功，部署已完成';
+          run.description = '同一提交已通过集成检查，目标环境的就绪检查已确认。可在执行历史查看之前的失败。';
+          run.logs = [['10:47:00', 'retry       same commit queued'], ['10:47:01', 'build       bundle compiled'], ['10:47:04', 'integration all checks passed'], ['10:47:07', 'deploy      readiness confirmed']];
+          render();
+          announce(run.title + ' 重试成功');
+        }, 1900);
+      }
+
+      const main = document.querySelector('main');
+      main.addEventListener('click', (event) => {
+        const button = event.target.closest('button');
+        if (!button) return;
+        if (button.dataset.filter) selectFilter(button.dataset.filter);
+        else if (button.dataset.run) openRun(button.dataset.run);
+        else if (button.hasAttribute('data-back')) {
+          view = 'list';
+          writeRoute();
+          workspace.dataset.view = view;
+          ($('[data-run="' + selected.id + '"]') || $('#runs-title')).focus();
+        } else if (button.hasAttribute('data-retry')) retryRun(selected);
+        else if (button.hasAttribute('data-reset')) {
+          selectFilter('all');
+          $('[data-filter="all"]').focus();
+        } else if (button.dataset.tab) {
+          tab = button.dataset.tab;
+          renderEvidence();
+        }
+      });
+      window.addEventListener('hashchange', () => { readRoute(); render(); });
+      readRoute();
+      render();
+    })();
+  </script>
+</body>
+</html>

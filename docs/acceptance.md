@@ -1,6 +1,23 @@
-# Form Studies 验收记录
+# 案例与交互验收记录
 
-## v1 → v2
+## 完整案例
+
+2026-11-24 在 Windows 上用 Edge 或 Chrome 的桌面视口和手机触控模拟验证。案例卡片使用 1440 × 900 的真实浏览器截图。封面由三张案例截图编排而成。
+
+| 案例 | 可以复现的操作 | 观察结果 |
+| --- | --- | --- |
+| [沿岸声志](https://gaoyuan513.github.io/frontend-design-director/cases/coast-atlas/) | 在地图点选夜港，切换两段声景，播放、跳到波形后一段，再收藏。 | 地图、详情和播放器同步。播放时切换上一段或下一段会继续播放。收藏在本地刷新后保留，笔记关闭时焦点返回入口。覆盖桌面、390px 触控和 320px 布局。 |
+| [发布诊断台](https://gaoyuan513.github.io/frontend-design-director/cases/release-desk/) | 选「失败」和 `web-checkout`，点「重试发布」，再看执行历史。 | 失败原因和日志与选中记录一致。重试先显示进行中，再更新成功状态及失败筛选结果。执行历史保留原来的失败原因。覆盖桌面和 390px 窄屏。 |
+| [光井](https://gaoyuan513.github.io/frontend-design-director/cases/lightwell/) | 在拱门、楼梯和树影之间切换，通过链接直接进入树影章节，再试浏览器返回和刷新。 | 照片裁切、图注与选中章节同步更新。深链接、前进后退和刷新恢复相应章节。关掉 JavaScript 时三章仍可阅读。覆盖桌面、390px 触控和 320px 布局。 |
+| [印刷所开放日](https://gaoyuan513.github.io/frontend-design-director/cases/print-room/) | 组合选择日期和工艺，打开详情并下载准备清单。尝试筛出空结果后恢复。 | 场次数跟随筛选，空结果提供恢复入口。键盘可以打开详情、下载 UTF-8 清单、按 Escape 关闭并恢复焦点。覆盖桌面、390px 触控和 320px 布局。 |
+
+运行记录、活动排程与海岸位置为示例。沿岸声志使用合成声景和生成配图，光井使用生成的庭院影像。测试覆盖记录中的交互和视口，手机操作来自浏览器模拟。
+
+案例集在 1440、390 和 320px 下验证了分类筛选、卡片计数和截图比例。桌面通过四张卡片的入口进入对应案例并返回目录。上述检查无页面溢出或资源错误。
+
+## Form Studies 验收记录
+
+### v1 → v2
 
 | v1 | v2 |
 | --- | --- |
@@ -13,7 +30,7 @@
 
 [Live Demo](https://gaoyuan513.github.io/frontend-design-director/) · [代码](demo/) · [案例库](../references/award-winning-case-studies.md)
 
-## 浏览器与录屏
+### 浏览器与录屏
 
 Edge 157.0.4341.60，Windows。本地桌面视口 1360 × 820，移动端为 390 × 844 触控模拟。
 
@@ -33,7 +50,7 @@ Edge 157.0.4341.60，Windows。本地桌面视口 1360 × 820，移动端为 390
 
 [播放当时的录屏](https://gaoyuan513.github.io/frontend-design-director/reel/)
 
-## 2026-11-24 · 展示页复测
+### 2026-11-24 · 展示页复测
 
 Windows Edge 158.0.4370.33。桌面视口为 1360 × 820，窄屏检查使用 390 × 844 触控模拟和 320 × 700 视口。
 
