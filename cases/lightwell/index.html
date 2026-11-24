@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="沿拱门、楼梯和树下三处取景，阅读一座庭院。">
+  <meta name="theme-color" content="#f3eee4">
+  <link rel="icon" href="data:,">
+  <title>光井 / Lightwell</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #f3eee4;
+      --ink: #28261f;
+      --muted: #5e584c;
+      --accent: #83492f;
+      --rule: #bdb1a3;
+      --display: Georgia, "Songti SC", "Noto Serif CJK SC", SimSun, "Microsoft YaHei", serif;
+      --sans: "Inter", "Microsoft YaHei", system-ui, sans-serif;
+      --gutter: clamp(20px, 5vw, 78px);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font: 15px/1.85 var(--sans);
+    }
+    h1, h2, h3, p, figure { margin: 0; }
+    a { color: inherit; }
+    a:focus-visible, .chapter h3:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+    [hidden] { display: none !important; }
+
+    .shell { width: min(calc(100% - 2 * var(--gutter)), 1280px); margin-inline: auto; }
+    .masthead, .footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      border-bottom: 1px solid var(--rule);
+    }
+    .masthead a, .footer a {
+      display: inline-flex;
+      align-items: center;
+      min-height: 64px;
+      font-size: 13px;
+      text-decoration: none;
+    }
+    .masthead a:hover, .footer a:hover { color: var(--accent); text-decoration: underline; }
+
+    .cover {
+      display: grid;
+      grid-template-columns: minmax(0, .83fr) minmax(0, 1.17fr);
+      align-items: center;
+      gap: clamp(34px, 5.8vw, 96px);
+      padding-block: clamp(50px, 6vw, 96px) clamp(36px, 5vw, 68px);
+    }
+    .cover-copy { padding-bottom: 30px; }
+    .eyebrow, .chapter-count, .cover figcaption, .chapter figcaption {
+      color: var(--muted);
+      font-size: 12px;
+      letter-spacing: .085em;
+    }
+    .eyebrow { color: var(--accent); }
+    .cover h1 {
+      margin: 26px 0 30px;
+      font: 400 clamp(76px, 10vw, 148px)/.94 var(--display);
+      letter-spacing: -.1em;
+    }
+    .cover h1 em {
+      display: block;
+      margin-top: .16em;
+      margin-left: -.035em;
+      color: var(--accent);
+      font-size: .57em;
+      font-weight: 400;
+      letter-spacing: -.065em;
+    }
+    .standfirst {
+      max-width: 25em;
+      color: var(--muted);
+      font-size: clamp(15px, 1.3vw, 18px);
+    }
+    .read-start, .continue {
+      display: inline-flex;
+      align-items: center;
+      gap: 14px;
+      min-height: 44px;
+      margin-top: 30px;
+      border-bottom: 1px solid currentColor;
+      color: var(--accent);
+      text-decoration: none;
+    }
+    .read-start:hover, .continue:hover { color: var(--ink); }
+    .image-frame { overflow: hidden; background: #977059; }
+    .cover .image-frame { aspect-ratio: 1.16; }
+    .image-frame img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .cover img { transform: scale(1.045); transform-origin: 100% 100%; }
+    .cover figcaption {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 7px 14px;
+      padding-top: 10px;
+    }
+
+    .reading {
+      display: grid;
+      grid-template-columns: minmax(156px, .25fr) minmax(0, 1fr);
+      gap: clamp(25px, 4vw, 68px);
+      padding-block: 42px clamp(50px, 6vw, 88px);
+      border-top: 1px solid var(--rule);
+      scroll-margin-top: 20px;
+    }
+    .chapter-selector { align-self: start; position: sticky; top: 24px; }
+    .chapter-selector h2 { margin-bottom: .65rem; font-size: 15px; font-weight: 500; }
+    .chapter-selector a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-height: 48px;
+      padding: 6px 0;
+      border-top: 1px solid var(--rule);
+      font-size: 14px;
+      text-decoration: none;
+    }
+    .chapter-selector a:last-child { border-bottom: 1px solid var(--rule); }
+    .chapter-selector a[aria-current], .chapter-selector a:hover { color: var(--accent); }
+    .chapter-selector a[aria-current] { font-weight: 650; }
+    .chapter-index { color: var(--muted); font: 13px Georgia, serif; }
+    .chapter {
+      display: grid;
+      grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+      grid-template-areas: "figure body";
+      align-items: center;
+      gap: clamp(25px, 3.5vw, 55px);
+      margin-bottom: 46px;
+      scroll-margin-top: 24px;
+    }
+    .chapter:last-child { margin-bottom: 0; }
+    .chapter-body { grid-area: body; }
+    .chapter figure { grid-area: figure; }
+    .chapter .image-frame { aspect-ratio: 4 / 3; }
+    .chapter img { transform: scale(var(--zoom)); transform-origin: var(--origin); }
+    #threshold { --zoom: 1.58; --origin: 12% 54%; }
+    #stair { --zoom: 1.48; --origin: 100% 37%; }
+    #shade { --zoom: 1.62; --origin: 45% 100%; }
+    .chapter h3 {
+      margin: 12px 0 17px;
+      font: 400 clamp(34px, 4.1vw, 65px)/1.05 var(--display);
+      letter-spacing: -.075em;
+    }
+    .chapter-body > p:not(.chapter-count) { color: var(--muted); }
+    .chapter figcaption { padding-top: 9px; }
+    .footer { border-top: 1px solid var(--rule); border-bottom: 0; }
+    .footer a:last-child { color: var(--muted); }
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip-path: inset(50%);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-width: 760px) {
+      .cover { grid-template-columns: minmax(0, 1fr); gap: 30px; padding-top: 46px; }
+      .cover-copy { padding-bottom: 0; }
+      .cover h1 { font-size: clamp(67px, 16vw, 110px); margin: 19px 0 21px; }
+      .read-start, .continue { margin-top: 17px; }
+      .reading { grid-template-columns: minmax(0, 1fr); gap: 31px; padding-top: 30px; }
+      .chapter-selector { position: static; }
+      .chapter-selector nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+      .chapter-selector a, .chapter-selector a:last-child { border-bottom: 1px solid var(--rule); }
+      .chapter-selector a { gap: 5px; font-size: 13px; }
+      .chapter { grid-template-columns: minmax(0, 1fr); grid-template-areas: "body" "figure"; gap: 19px; }
+      .chapter h3 { margin: 7px 0 12px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+    }
+  </style>
+</head>
+<body id="top">
+  <header class="shell masthead">
+    <a href="../">← 案例目录</a>
+    <a href="#chapters">阅读章节 ↓</a>
+  </header>
+  <main class="shell">
+    <section class="cover" aria-labelledby="title">
+      <div class="cover-copy">
+        <p class="eyebrow">建筑影像札记</p>
+        <h1 id="title">光井<em lang="en">Lightwell.</em></h1>
+        <p class="standfirst">从拱门进入，沿墙拾级，再回望树下。跟着三处取景，读阳光怎样改变庭院的尺度。</p>
+        <a class="read-start" href="#chapters">开始阅读 <span aria-hidden="true">↓</span></a>
+      </div>
+      <figure>
+        <div class="image-frame">
+          <img src="../../courtyard.webp" alt="暖色庭院一侧是拱门，另一侧是楼梯，树影落在墙面和砖地上" fetchpriority="high" width="868" height="735">
+        </div>
+        <figcaption><span>庭院全景</span><span>拱门 · 楼梯 · 树下</span></figcaption>
+      </figure>
+    </section>
+
+    <section class="reading" id="chapters" aria-labelledby="chapter-index">
+      <aside class="chapter-selector">
+        <h2 id="chapter-index">阅读章节</h2>
+        <nav aria-label="阅读章节">
+          <a href="#threshold" data-chapter="threshold" aria-current="location"><span class="chapter-index">01</span> 拱门</a>
+          <a href="#stair" data-chapter="stair"><span class="chapter-index">02</span> 楼梯</a>
+          <a href="#shade" data-chapter="shade"><span class="chapter-index">03</span> 树下</a>
+        </nav>
+      </aside>
+      <div class="chapter-content">
+        <article class="chapter" id="threshold" aria-labelledby="threshold-title">
+          <div class="chapter-body">
+            <p class="chapter-count">取景 01 / 03</p>
+            <h3 id="threshold-title" tabindex="-1">拱门深处</h3>
+            <p>从亮处向里看，拱下先出现一段暗色通道。更远的树从第二道拱边露出一角，视线越过阴影，才在庭院另一侧停下来。</p>
+            <a class="continue" href="#stair" data-chapter="stair" data-continue>看楼梯 <span aria-hidden="true">→</span></a>
+          </div>
+          <figure>
+            <div class="image-frame"><img src="../../courtyard.webp" alt="裁切图聚焦左侧拱门，近处通道在阴影里，开口尽头有树" width="868" height="735" loading="lazy"></div>
+            <figcaption>由明入暗，两层拱线分开了前后距离。</figcaption>
+          </figure>
+        </article>
+
+        <article class="chapter" id="stair" aria-labelledby="stair-title">
+          <div class="chapter-body">
+            <p class="chapter-count">取景 02 / 03</p>
+            <h3 id="stair-title" tabindex="-1">楼梯转角</h3>
+            <p>斜光把踏步的边缘一层层标出来。视线沿着扶墙上移，墙面仍留着叶片的影子，硬直的阶线也因此有了停顿。</p>
+            <a class="continue" href="#shade" data-chapter="shade" data-continue>到树下 <span aria-hidden="true">→</span></a>
+          </div>
+          <figure>
+            <div class="image-frame"><img src="../../courtyard.webp" alt="裁切图聚焦右侧楼梯，日光照着踏步，叶影落在扶墙上" width="868" height="735" loading="lazy"></div>
+            <figcaption>光掠过踏步和扶墙，留下两组不同的边缘。</figcaption>
+          </figure>
+        </article>
+
+        <article class="chapter" id="shade" aria-labelledby="shade-title">
+          <div class="chapter-body">
+            <p class="chapter-count">取景 03 / 03</p>
+            <h3 id="shade-title" tabindex="-1">树下的影</h3>
+            <p>把目光落回地面。枝叶的影子越过砖缝，和墙边的陶罐连成一个更低、更近的画面。走过拱门时，最先遇到的正是这片阴凉。</p>
+            <a class="continue" href="#top">回看庭院全景 <span aria-hidden="true">↑</span></a>
+          </div>
+          <figure>
+            <div class="image-frame"><img src="../../courtyard.webp" alt="裁切图聚焦底部铺砖、陶罐和落在地面的斑驳树影" width="868" height="735" loading="lazy"></div>
+            <figcaption>陶罐、砖缝和叶影，让视线回到脚下。</figcaption>
+          </figure>
+        </article>
+      </div>
+      <span class="sr-only" role="status" data-chapter-status></span>
+    </section>
+  </main>
+  <footer class="shell footer">
+    <a href="../">← 返回案例目录</a>
+    <a href="#top">回到页首 ↑</a>
+  </footer>
+  <script>
+    (() => {
+      const reading = document.getElementById('chapters');
+      const chapters = new Map([...reading.querySelectorAll('.chapter')].map(chapter => [chapter.id, chapter]));
+      const navigation = [...reading.querySelectorAll('nav [data-chapter]')];
+      const status = reading.querySelector('[data-chapter-status]');
+      const defaultChapter = chapters.keys().next().value;
+      let activeChapter;
+
+      function showChapter(id, moveFocus = false) {
+        if (id === activeChapter) return;
+        const panel = chapters.get(id);
+        const heading = panel.querySelector('h3');
+        const hadFocus = activeChapter && document.activeElement?.closest('.chapter')?.id === activeChapter;
+
+        for (const [name, chapter] of chapters) chapter.hidden = name !== id;
+        for (const link of navigation) {
+          if (link.dataset.chapter === id) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        }
+
+        if (moveFocus || hadFocus) heading.focus({ preventScroll: true });
+        if (moveFocus) heading.scrollIntoView({ block: 'nearest' });
+        if (activeChapter && !moveFocus && !hadFocus) status.textContent = '已切换至' + heading.textContent;
+        activeChapter = id;
+      }
+
+      function followHash() {
+        const id = location.hash.slice(1);
+        showChapter(chapters.has(id) ? id : defaultChapter);
+      }
+
+      reading.addEventListener('click', event => {
+        const link = event.target.closest('[data-chapter]');
+        if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        if (location.hash !== link.hash) history.pushState(null, '', link.hash);
+        showChapter(link.dataset.chapter, link.hasAttribute('data-continue'));
+      });
+
+      window.addEventListener('popstate', followHash);
+      window.addEventListener('hashchange', followHash);
+      followHash();
+    })();
+  </script>
+</body>
+</html>
