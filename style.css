@@ -13,3 +13,67 @@
 .plane button:nth-child(2) {background:#247353;border-radius:64% 30% 45% 42%}
 .plane button:nth-child(3) {background:#876420;border-radius:8%}
 @media(max-width:720px){h1{font-size:clamp(54px,15vw,98px)}h1 em{margin-left:.12em}.headline{right:4%}.stage{height:calc(100svh - 56px)}}
+
+.stage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.stage-actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 1px solid #697164;
+  background: #171d17;
+  color: #f0ede1;
+}
+
+.stage-actions a:hover {
+  border-color: #ecc193;
+  color: #ffd5ad;
+}
+
+.stage-actions .primary-action {
+  border-color: #ecc193;
+  background: #ecc193;
+  color: #171d17;
+}
+
+.stage-actions .primary-action:hover {
+  background: #ffd5ad;
+  color: #171d17;
+}
+
+.project-path {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  max-width: 920px;
+  margin: 28px 0 18px;
+}
+
+.project-path > div {
+  padding-top: 12px;
+  border-top: 1px solid #56604f;
+}
+
+.project-path dt {font-weight: 600}
+.project-path dd {margin: 6px 0 0; color: #d5d6c9}
+
+@media (min-width: 721px) {
+  .stage {height: calc(100svh - 64px)}
+}
+
+@media (max-width: 720px) {
+  .stage-foot {
+    flex-direction: column;
+    align-items: start;
+    gap: 5px;
+    padding: 8px 0;
+  }
+
+  .stage-actions a {font-size: 12px}
+  .project-path {grid-template-columns: minmax(0, 1fr); gap: 12px}
+}
