@@ -9,7 +9,7 @@ const modes = [
 ];
 const instrument = lineInstrument($('#field'), true);
 $('#spin').onclick = () => instrument.rotate();
-const rack = $('.rack'), dialog = $('#detail');
+const rack = $('.rack'), dialog = $('#detail'), tryExperiment = $('#try-experiment');
 $('#track').innerHTML = modes.map(([slug,mode,title,symbol,paper,ink],i) =>
   `<a draggable="false" class="plate" href="#demo-${slug}" style="--paper:${paper};--ink:${ink}"><span class="serial">0${i+1} / 06</span><span class="symbol" aria-hidden="true">${symbol}</span><b>${title}</b><span>${mode} ↗</span></a>`).join('');
 let origin, suppress = false;
@@ -23,32 +23,74 @@ rack.onpointerup=e=>{
   const link=e.target.closest('.plate');
   const tap=e.pointerType==='touch' && origin && !suppress && link;
   origin=null;rack.classList.remove('grabbing');
-  if(tap){e.preventDefault();history.pushState({fromRack:true},'',link.hash);openRoute()}
+  if(tap){e.preventDefault();openExperiment(link)}
 };
 rack.onpointercancel=()=>{origin=null;rack.classList.remove('grabbing')};
 rack.onlostpointercapture=e=>{if(e.target===rack){origin=null;rack.classList.remove('grabbing')}};
 rack.addEventListener('click',e=>{if(suppress && e.detail){e.preventDefault();suppress=false}},true);
 $('#back').onclick=()=>rack.scrollBy(-rack.clientWidth*.65,0);
 $('#forward').onclick=()=>rack.scrollBy(rack.clientWidth*.65,0);
-let cleanup = ()=>{}, opener=null;
-function openRoute(){
-  const m=modes.find(a=>'#demo-'+a[0]===location.hash);
-  cleanup();cleanup=()=>{};
-  if(!m){if(dialog.open){dialog.close();opener?.focus({preventScroll:true})}return}
-  const [slug,mode,title,,paper,ink]=m;
-  opener=document.querySelector('a[href="#demo-'+slug+'"]');
-  $('#mode').textContent='DEMO / '+mode;
-  $('#content').innerHTML='<section class="demo"><h2 id="experiment-title">'+title+'</h2><div id="sample"></div></section>';
-  $('.demo').style.setProperty('--paper',paper);$('.demo').style.setProperty('--ink',ink);
-  if(!dialog.open)dialog.showModal();
-  document.body.style.overflow='hidden';
-  cleanup=experiments[slug]($('#sample')) || (()=>{});
+let cleanup = () => {};
+let opener = null;
+
+function openExperiment(link) {
+  if (location.hash === link.hash) return;
+  const state = link === tryExperiment ? { fromOpening: true } : { fromRack: true };
+  history.pushState(state, '', link.hash);
+  openRoute();
 }
-function exitDetail(){if(history.state?.fromRack)history.back();else location.replace('#studies')}
-$('#close').onclick=exitDetail;
-dialog.oncancel=e=>{e.preventDefault();exitDetail()};
-dialog.addEventListener('close',()=>document.body.style.overflow='');
-rack.addEventListener('click',e=>{const a=e.target.closest('.plate');if(!a||e.defaultPrevented||e.metaKey||e.ctrlKey)return;e.preventDefault();if(location.hash===a.hash)return;history.pushState({fromRack:true},'',a.hash);openRoute()});
+
+function openRoute() {
+  const experiment = modes.find(([slug]) => '#demo-' + slug === location.hash);
+  cleanup();
+  cleanup = () => {};
+
+  if (!experiment) {
+    if (dialog.open) {
+      dialog.close();
+      document.body.style.overflow = '';
+      opener.focus({ preventScroll: true });
+      opener.scrollIntoView({ behavior: 'instant', block: 'nearest', inline: 'nearest' });
+      opener = null;
+    }
+    return;
+  }
+
+  const [slug, mode, title, , paper, ink] = experiment;
+  opener = history.state?.fromOpening
+    ? tryExperiment
+    : rack.querySelector('.plate[href="#demo-' + slug + '"]') || $('#studies-title');
+  $('#mode').textContent = 'DEMO / ' + mode;
+  $('#content').innerHTML = '<section class="demo"><h2 id="experiment-title">' + title + '</h2><div id="sample"></div></section>';
+  $('.demo').style.setProperty('--paper', paper);
+  $('.demo').style.setProperty('--ink', ink);
+  if (!dialog.open) dialog.showModal();
+  document.body.style.overflow = 'hidden';
+  cleanup = experiments[slug]($('#sample')) || (() => {});
+}
+
+function exitDetail() {
+  if (history.state?.fromRack || history.state?.fromOpening) {
+    history.back();
+    return;
+  }
+
+  history.replaceState(history.state, '', '#studies');
+  openRoute();
+}
+
+$('#close').onclick = exitDetail;
+dialog.oncancel = event => {
+  event.preventDefault();
+  exitDetail();
+};
+
+document.addEventListener('click', event => {
+  const link = event.target.closest('.plate, #try-experiment');
+  if (!link || event.defaultPrevented || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  openExperiment(link);
+});
 const experiments={
   creative(el){
     el.innerHTML='<p>改变扭转幅度，观察同一条曲面如何由折带收拢为圆环。</p><canvas aria-label="实时线束试样"></canvas><label>折叠幅度 <input type="range" min="0" max="150" value="100"></label><output>100%</output>';

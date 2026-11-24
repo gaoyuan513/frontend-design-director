@@ -2,23 +2,27 @@
 
 ## Choose the concept before the renderer
 
-Compare three proposals as compact lines: **metaphor / object / composition / input / transformation / cost**. Reject proposals whose defining experience survives unchanged when the input handler is removed. A practical constraint should change the rendering strategy before it erases the idea.
+For an open experimental brief, compare a few proposals on **metaphor / object / composition / input / transformation / cost**. Use the direction the user chose when the concept is already set. For a brief centered on interaction, prototype the strongest input and identify the change a visitor can see or hear. Test the same action on a narrow touch viewport before committing to the renderer. Consider changing rendering strategy first when a device constraint threatens the idea.
 
 For Felix, a specimen drawer could reveal samples by pulling trays (DOM transforms, shallow depth); an optical bench could align lenses to reveal project text (SVG masks, difficult touch precision); a field instrument could rotate one continuous line sculpture, then separate its traces as the reader scrolls (projected Canvas curves, keyboard alternatives). The last connects a personal identity, a family of modes and their controls through one visible object.
 
 ## Art direction contract
 
-Choose a dominant silhouette, a material response, one type contrast, a scale relationship and an intentionally quiet region. Compose at phone width from the start. Put oversized type behind or beside the object only while essential words remain legible. Establish one repeated motif (e.g. a calibration tick) that carries meaning when the scene changes. Plan how density, color and negative space shift between opening, exploration, detail and exit.
+Choose a dominant silhouette, a material response, a type contrast, a scale relationship and an intentionally quiet region. Compose at phone width from the start. Put oversized type behind or beside the object only while essential words remain legible. Plan how density, color and negative space shift across scenes. A recurring motif can carry meaning through the transition, such as calibration ticks moving from the opening sculpture to a detail control.
+
+Art-direct the asset and its crop together. Identify the subject that must survive a narrow crop and where text needs quiet space. Use the supplied visual material when it serves that composition, or create or source material for the intended use. Keep headings, labels and actions in the page so they remain readable over changing imagery.
 
 ## Motion score
 
-For each beat specify trigger, property or geometry, duration/continuation, interruption, exit and equivalent low-motion action. Example: entering the index separates traces in proportion to native scroll; reversing scroll reassembles them; opening a detail pauses the field; reduced motion selects the resolved pose. A pointer can influence orientation while drag commits a larger turn. Give magnetic or spring controls a bounded range, independent click target and keyboard focus.
+For each important beat, specify the trigger, visible change, timing, interruption and exit. Entering the index can separate traces in proportion to native scroll. Reversing scroll reassembles them, opening a detail pauses the field, and reduced motion selects the resolved pose. A pointer can influence orientation while drag commits a larger turn. Give magnetic or spring controls a bounded range, independent click target and keyboard focus.
 
-Use kinetic type or mask reveals to establish reading order; keep headings in the DOM. Use parallax and camera movement for changes of viewpoint, not for body text. Let gallery inertia decay and clamp it at the bounds. Preserve focus when crossing a scene boundary. Keep sound opt-in.
+Use kinetic type or mask reveals to establish reading order and keep headings in the DOM. Reserve parallax and camera movement for changes of viewpoint. Let gallery inertia decay and clamp it at the bounds. Preserve focus when crossing a scene boundary. Keep sound opt-in.
 
 ## Rendering decision
 
-CSS transforms suit a few planes and masks. SVG suits editable paths. Canvas suits many projected strokes or particles. Motion is useful for interruptible component states; GSAP/ScrollTrigger for coordinated timelines. Lenis is justified only if the scroll model needs it and history, native inputs and reduced motion still work. React Bits can supply an isolated, audited interaction. For a true lit volume, occlusion or per-pixel material use Three.js / R3F or a small GLSL shader; consider WebGPU only with a tested fallback. Measure the active frame cost, cap resolution and stop rendering offscreen. Ship readable content before optional assets.
+Choose the renderer from the verified prototype. CSS transforms suit a few planes and masks. SVG suits paths that need individual styling or interaction. Canvas suits many projected strokes or particles. Consider a GPU renderer for lit geometry, occlusion or per-pixel materials. Reuse the project's motion tools where possible. A coordinated timeline or a custom scroll model is worthwhile when it produces a visible improvement and preserves interruption, navigation, native input and reduced motion. See [implementation options](implementation.md) if the current stack has a specific gap.
+
+Keep the core content reachable while visual assets load and if enhanced rendering fails. For an input-driven canvas, draw on state changes where possible. For a continuously animated scene, pause when hidden and release resources on exit. Cap render resolution where it is a bottleneck. Measure the active interaction before adding effects and use [browser verification](quality-checklist.md) to compare it after changes.
 
 ## Capture the experience
 

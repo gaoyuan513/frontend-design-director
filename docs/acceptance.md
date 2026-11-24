@@ -31,4 +31,14 @@ Edge 157.0.4341.60，Windows。本地桌面视口 1360 × 820，移动端为 390
 
 桌面视频 1280 × 720，约 25 秒，包含首屏、拖拽、滚动和六种实验。手机视频 420 × 840，约 9 秒，演示触控流程。视频来自 Edge 的实际浏览器帧，加入了章节字幕，经过节奏调整，无音轨。手机素材取自触控模拟。
 
-[播放录屏](https://gaoyuan513.github.io/frontend-design-director/reel/) · [桌面截图](evidence/opening.png) · [手机截图](evidence/mobile.png)
+[播放当时的录屏](https://gaoyuan513.github.io/frontend-design-director/reel/)
+
+## 2026-11-24 · 展示页复测
+
+Windows Edge 158.0.4370.33。桌面视口为 1360 × 820，窄屏检查使用 390 × 844 触控模拟和 320 × 700 视口。
+
+从首屏用 Tab 和 Enter 打开曲面调制，操作滑杆后按 Escape，焦点回到可见的首屏入口。直接打开 `#demo-swiss` 后关闭详情，实验索引会将对应卡片滚入视野并恢复焦点。修复前，同一路径关闭后对应卡片仍在索引可视区外。
+
+桌面打开 `#demo-workspace`，选中「导入索引」并点击「重试导入」。日志依次显示 `FAILED`、`RUNNING` 和 `DONE`，重试期间按钮禁用。关闭详情后，事件回放卡片可见并获得焦点。
+
+手机模拟中，从索引打开末张卡片再关闭，仍可继续浏览。320px 视口无页面横向溢出。减弱动态时，入口和 15° 旋转按钮保持可用。上述检查未观察到 JavaScript 或资源请求错误。[桌面截图](evidence/opening.png) · [手机截图](evidence/mobile.png)
